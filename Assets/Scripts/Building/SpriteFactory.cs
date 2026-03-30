@@ -34,50 +34,87 @@ public static class SpriteFactory
     public static Sprite GetMiner()
     {
         if (_miner != null) return _miner;
-        _miner = CreateMinerSprite();
+        _miner = LoadCustomSprite("Sprites/Buildings/Miner");
+        if (_miner == null)
+            _miner = CreateMinerSprite();
         return _miner;
     }
 
     public static Sprite GetConveyorStraight()
     {
         if (_conveyorStraight != null) return _conveyorStraight;
-        _conveyorStraight = CreateConveyorStraightSprite();
+        _conveyorStraight = LoadCustomSprite("Sprites/Buildings/ConveyorStraight");
+        if (_conveyorStraight == null)
+            _conveyorStraight = CreateConveyorStraightSprite();
         return _conveyorStraight;
     }
 
     public static Sprite GetConveyorCorner()
     {
         if (_conveyorCorner != null) return _conveyorCorner;
-        _conveyorCorner = CreateConveyorCornerSprite();
+        _conveyorCorner = LoadCustomSprite("Sprites/Buildings/ConveyorCorner");
+        if (_conveyorCorner == null)
+            _conveyorCorner = CreateConveyorCornerSprite();
         return _conveyorCorner;
     }
 
     public static Sprite GetSplitter()
     {
         if (_splitter != null) return _splitter;
-        _splitter = CreateSplitterSprite();
+        _splitter = LoadCustomSprite("Sprites/Buildings/Splitter");
+        if (_splitter == null)
+            _splitter = CreateSplitterSprite();
         return _splitter;
     }
 
     public static Sprite GetMerger()
     {
         if (_merger != null) return _merger;
-        _merger = CreateMergerSprite();
+        _merger = LoadCustomSprite("Sprites/Buildings/Merger");
+        if (_merger == null)
+            _merger = CreateMergerSprite();
         return _merger;
     }
 
     public static Sprite GetProductionStation()
     {
         if (_productionStation != null) return _productionStation;
-        _productionStation = CreateProductionStationSprite();
+        _productionStation = LoadCustomSprite("Sprites/Buildings/ProductionStation");
+        if (_productionStation == null)
+            _productionStation = CreateProductionStationSprite();
         return _productionStation;
     }
 
     public static Sprite GetCollector()
     {
         if (_collector != null) return _collector;
-        _collector = CreateCollectorSprite();
+        // Try loading custom sprite first, fall back to procedural
+        _collector = LoadCustomSprite("Sprites/Buildings/ResourceCollector");
+        if (_collector == null)
+            _collector = CreateCollectorSprite();
         return _collector;
+    }
+
+    /// <summary>
+    /// Loads a custom sprite from Assets/Resources/{path}.
+    /// Returns null if not found (falls back to procedural generation).
+    /// </summary>
+    private static Sprite LoadCustomSprite(string path)
+    {
+        // Load as Texture2D so we control PPU ourselves
+        Texture2D tex = Resources.Load<Texture2D>(path);
+        if (tex != null)
+        {
+            // PPU = texture width → sprite fills exactly 1 grid cell (1 world unit)
+            float ppu = tex.width;
+            Sprite sprite = Sprite.Create(tex,
+                new Rect(0, 0, tex.width, tex.height),
+                new Vector2(0.5f, 0.5f),
+                ppu);
+            return sprite;
+        }
+
+        return null;
     }
 
     public static Sprite GetSquare()
